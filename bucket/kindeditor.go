@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/empirefox/iniu/comm"
-	. "github.com/empirefox/iniu/conf"
-	bucketdb "github.com/empirefox/iniu/gorm"
+	. "github.com/empirefox/iniu-old/comm"
+	. "github.com/empirefox/iniu-old/conf"
+	bucketdb "github.com/empirefox/iniu-old/gorm"
 	"github.com/go-martini/martini"
 	"github.com/golang/glog"
 	"github.com/martini-contrib/binding"

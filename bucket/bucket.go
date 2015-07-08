@@ -1,8 +1,8 @@
 package bucket
 
 import (
-	"github.com/empirefox/iniu/comm"
-	db "github.com/empirefox/iniu/gorm"
+	"github.com/empirefox/iniu-old/comm"
+	db "github.com/empirefox/iniu-old/gorm"
 	"github.com/go-martini/martini"
 	"github.com/golang/glog"
 	"github.com/martini-contrib/render"

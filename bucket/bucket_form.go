@@ -1,12 +1,13 @@
 package bucket
 
 import (
-	. "github.com/empirefox/iniu/conf"
-	"github.com/empirefox/iniu/form"
-	db "github.com/empirefox/iniu/gorm"
+	"time"
+
+	. "github.com/empirefox/iniu-old/conf"
+	"github.com/empirefox/iniu-old/form"
+	db "github.com/empirefox/iniu-old/gorm"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
-	"time"
 )
 
 var bucketForm = &form.Form{

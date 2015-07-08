@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	. "github.com/empirefox/iniu/conf"
+	. "github.com/empirefox/iniu-old/conf"
 	"github.com/golang/glog"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
