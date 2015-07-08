@@ -121,7 +121,7 @@ func ListFilesHandlers() []martini.Handler {
 		switch length := len([]rune(data.Path)); length {
 		case 0: //""
 			listYears(r, list)
-		case 5: //"2014年"
+		case 5, 6: //"2014年, 2014年/"
 			listMonths(r, list)
 		case 7, 8: //"2014年4月"
 			listFiles(&data, list)
@@ -137,7 +137,7 @@ func ListFilesHandlers() []martini.Handler {
 
 //列出图片
 func listFiles(data *ListReqData, list *KindList) {
-	currPath := list.CurrentDirPath
+	currPath := strings.TrimSuffix(list.CurrentDirPath, "/")
 	t, err := time.Parse("2006年1月", currPath)
 	if err != nil {
 		glog.Infoln("解析时间错误:", err)
@@ -190,7 +190,7 @@ func listFiles(data *ListReqData, list *KindList) {
 
 //列出月份
 func listMonths(r *http.Request, list *KindList) {
-	year, err := strconv.Atoi(strings.TrimSuffix(list.CurrentDirPath, "年"))
+	year, err := strconv.Atoi(strings.TrimSuffix(strings.TrimSuffix(list.CurrentDirPath, "/"), "年"))
 	if err != nil {
 		return
 	}
