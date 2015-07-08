@@ -2,21 +2,22 @@ package bucket
 
 import (
 	"encoding/json"
-	. "github.com/empirefox/iniu/comm"
-	. "github.com/empirefox/iniu/conf"
-	bucketdb "github.com/empirefox/iniu/gorm"
-	"github.com/go-martini/martini"
-	"github.com/golang/glog"
-	"github.com/martini-contrib/binding"
-	"github.com/qiniu/api/auth/digest"
-	"github.com/qiniu/api/rs"
-	"github.com/qiniu/api/rsf"
 	"io"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	. "github.com/empirefox/iniu/comm"
+	. "github.com/empirefox/iniu/conf"
+	bucketdb "github.com/empirefox/iniu/gorm"
+	"github.com/go-martini/martini"
+	"github.com/golang/glog"
+	"github.com/martini-contrib/binding"
+	"github.com/qiniu/api.v6/auth/digest"
+	"github.com/qiniu/api.v6/rs"
+	"github.com/qiniu/api.v6/rsf"
 )
 
 type KindList struct {

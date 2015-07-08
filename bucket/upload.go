@@ -1,19 +1,20 @@
 package bucket
 
 import (
-	"github.com/empirefox/iniu/comm"
-	. "github.com/empirefox/iniu/conf"
-	bucketdb "github.com/empirefox/iniu/gorm"
-	"github.com/go-martini/martini"
-	"github.com/golang/glog"
-	"github.com/martini-contrib/binding"
-	qio "github.com/qiniu/api/io"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/empirefox/iniu/comm"
+	. "github.com/empirefox/iniu/conf"
+	bucketdb "github.com/empirefox/iniu/gorm"
+	"github.com/go-martini/martini"
+	"github.com/golang/glog"
+	"github.com/martini-contrib/binding"
+	qio "github.com/qiniu/api.v6/io"
 )
 
 var (

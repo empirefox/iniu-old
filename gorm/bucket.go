@@ -3,16 +3,17 @@ package gorm
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"os"
+	"time"
+
 	. "github.com/empirefox/iniu/conf"
 	"github.com/golang/glog"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 	"github.com/martini-contrib/binding"
-	"github.com/qiniu/api/auth/digest"
-	"github.com/qiniu/api/rs"
-	"net/http"
-	"os"
-	"time"
+	"github.com/qiniu/api.v6/auth/digest"
+	"github.com/qiniu/api.v6/rs"
 )
 
 var DB gorm.DB
