@@ -3,7 +3,6 @@ package gorm
 import (
 	"errors"
 	"fmt"
-	"net/http"
 	"os"
 	"time"
 
@@ -11,7 +10,6 @@ import (
 	"github.com/golang/glog"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
-	"github.com/martini-contrib/binding"
 	"github.com/qiniu/api.v6/auth/digest"
 	"github.com/qiniu/api.v6/rs"
 )
@@ -48,11 +46,6 @@ type Bucket struct {
 	Errors      int       `json:",omitempty"`
 	CreatedAt   time.Time `json:",omitempty"`
 	UpdatedAt   time.Time `json:",omitempty"`
-}
-
-//martini binding 包绑定时验证
-func (this *Bucket) Validate(errors *binding.Errors, req *http.Request) {
-	glog.Infoln(this)
 }
 
 //内存中new一个uptoken,没有持久化的,有效期为从现在开始的第X天

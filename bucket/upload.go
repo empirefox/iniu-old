@@ -115,6 +115,17 @@ func UploadHandlers() []martini.Handler {
 			return
 		}
 
+		if bucket.Uptoken == "" {
+			if err := bucket.NewUptoken(); err != nil {
+				retJsonp.Err(w, "NewUptoken:"+err.Error())
+				return
+			}
+			if err := bucket.Save(); err != nil {
+				retJsonp.Err(w, "Save:"+err.Error())
+				return
+			}
+		}
+
 		//上传内容到Qiniu
 		var ret qio.PutRet
 		// ret       	变量用于存取返回的信息，详情见 qio.PutRet
