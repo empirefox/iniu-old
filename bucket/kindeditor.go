@@ -2,6 +2,7 @@ package bucket
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"sort"
@@ -69,13 +70,9 @@ type ListReqData struct {
 	Callback string `form:"callback" binding:"required"`
 }
 
-func (data *ListReqData) Validate(errors *binding.Errors, req *http.Request) {
-	if strings.ToUpper(data.Dir) != "IMAGE" {
-		errors.Add([]string{"Dir"}, "ErrorClass", "Dir错误")
-	}
-	if data.Path != "" {
-		data.Path = strings.TrimSuffix(data.Path, "/")
-	}
+func (data *ListReqData) Err(w http.ResponseWriter, msg string) {
+	w.WriteHeader(http.StatusBadRequest)
+	fmt.Fprintf(w, `%s({"error":1,"message":"%s"})`, data.Callback, msg)
 }
 
 //--------------------------------------
@@ -116,16 +113,27 @@ func (data *ListReqData) Validate(errors *binding.Errors, req *http.Request) {
 func ListFilesHandlers() []martini.Handler {
 	var bind = binding.Bind(ListReqData{})
 	var listHandler = func(data ListReqData, w http.ResponseWriter, r *http.Request) {
+		if strings.ToUpper(data.Dir) != "IMAGE" {
+			data.Err(w, "dir should be IMAGE")
+			return
+		}
 		//根据path建立KindList
-		list := &KindList{CurrentDirPath: data.Path}
+		list := &KindList{CurrentDirPath: strings.TrimSuffix(data.Path, "/")}
 		switch length := len([]rune(data.Path)); length {
 		case 0: //""
 			listYears(r, list)
-		case 5, 6: //"2014年, 2014年/"
-			listMonths(r, list)
+		case 5: //"2014年, 2014年"
+			if err := listMonths(r, list); err != nil {
+				data.Err(w, err.Error())
+				return
+			}
 		case 7, 8: //"2014年4月"
-			listFiles(&data, list)
+			if err := listFiles(&data, list); err != nil {
+				data.Err(w, err.Error())
+				return
+			}
 		default:
+			data.Err(w, `Path wrong:`+data.Path)
 			return
 		}
 		io.WriteString(w, data.Callback+"(")
@@ -136,19 +144,22 @@ func ListFilesHandlers() []martini.Handler {
 }
 
 //列出图片
-func listFiles(data *ListReqData, list *KindList) {
-	currPath := strings.TrimSuffix(list.CurrentDirPath, "/")
-	t, err := time.Parse("2006年1月", currPath)
+func listFiles(data *ListReqData, list *KindList) error {
+	t, err := time.Parse("2006年1月", list.CurrentDirPath)
 	if err != nil {
-		glog.Infoln("解析时间错误:", err)
-		return
+		glog.Errorln("解析时间错误:", err)
+		return err
 	}
-	list.MoveupDirPath = t.Format("2006年")
-	prefix := t.Format(IMG_PRE_FMT)
 
 	//取得bucket
-	bucket, _ := bucketdb.FindByName(data.Bucket)
+	bucket, err := bucketdb.FindByName(data.Bucket)
+	if err != nil {
+		return err
+	}
+
 	list.CurrentUrl = bucket.ImgBaseUrl()
+	list.MoveupDirPath = t.Format("2006年")
+	prefix := t.Format(IMG_PRE_FMT)
 
 	//取得图片列表
 	list.FileList = make([]*KindFile, 0, 10)
@@ -181,18 +192,20 @@ func listFiles(data *ListReqData, list *KindList) {
 	}
 	if err != io.EOF {
 		//非预期的错误
-		glog.Infoln("listAll failed:", err)
+		glog.Errorln("listAll failed:", err)
+		return err
 	}
 	list.TotalCount = len(list.FileList)
 	list.Order = data.Order
 	sort.Sort(list)
+	return nil
 }
 
 //列出月份
-func listMonths(r *http.Request, list *KindList) {
-	year, err := strconv.Atoi(strings.TrimSuffix(strings.TrimSuffix(list.CurrentDirPath, "/"), "年"))
+func listMonths(r *http.Request, list *KindList) error {
+	year, err := strconv.Atoi(strings.TrimSuffix(list.CurrentDirPath, "/"))
 	if err != nil {
-		return
+		return err
 	}
 
 	list.MoveupDirPath = ""
@@ -215,6 +228,7 @@ func listMonths(r *http.Request, list *KindList) {
 			Datetime: "",
 		}
 	}
+	return nil
 }
 
 //列出年份
