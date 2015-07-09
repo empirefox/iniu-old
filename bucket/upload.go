@@ -42,14 +42,17 @@ func init() {
 }
 
 type UploadData struct {
-	UpTime   string                `form:"up_time"  binding:"required"`
-	Dir      string                `form:"dir"      binding:"required"`
-	Bucket   string                `form:"bucket"   binding:"required"`
+	UpTime string `form:"up_time"  binding:"required"`
+	Dir    string `form:"dir"      binding:"required"`
+	Bucket string `form:"bucket"   binding:"required"`
+}
+
+type FileData struct {
 	LocalUrl string                `form:"localUrl" binding:"required"`
 	ImgFile  *multipart.FileHeader `form:"imgFile"`
 }
 
-func (data *UploadData) ImgName() string {
+func (data *FileData) ImgName() string {
 	imgName := data.LocalUrl
 	if strings.ContainsAny(imgName, "/\\:") {
 		i := strings.LastIndexAny(imgName, "/\\:")
@@ -91,16 +94,15 @@ func (ret *UploadRetJsonp) Err(w http.ResponseWriter, err string) {
 
 //martini Handler
 func UploadHandlers() []martini.Handler {
-	var bind martini.Handler = binding.MultipartForm(UploadData{})
-	var upload = func(data UploadData, w http.ResponseWriter) {
+	var upload = func(fileData FileData, data UploadData, w http.ResponseWriter) {
 		retJsonp := &UploadRetJsonp{MessengerJs: MessengerJs, UpTime: data.UpTime}
 
 		if strings.ToUpper(data.Dir) != "IMAGE" {
-			retJsonp.Err(w, "dir wrong")
+			retJsonp.Err(w, "dir wrong:"+data.Dir)
 			return
 		}
 
-		imgFile, err := data.ImgFile.Open()
+		imgFile, err := fileData.ImgFile.Open()
 		if err != nil {
 			retJsonp.Err(w, "ImgFile:"+err.Error())
 			return
@@ -120,7 +122,7 @@ func UploadHandlers() []martini.Handler {
 		// key:imgName	为文件存储的标识
 		// r:imgFile   	为io.Reader类型，用于从其读取数据
 		// extra     	为上传文件的额外信息,可为空， 详情见 qio.PutExtra, 可选
-		err = qio.Put(nil, &ret, bucket.Uptoken, data.ImgName(), imgFile, nil)
+		err = qio.Put(nil, &ret, bucket.Uptoken, fileData.ImgName(), imgFile, nil)
 		if err != nil {
 			bucket.LogErr()
 			retJsonp.Err(w, "Put:"+err.Error())
@@ -131,5 +133,5 @@ func UploadHandlers() []martini.Handler {
 		//w.Header().Set("Content-type", "application/json")
 		retJsonp.Respose(w, bucket.ImgUrl(ret.Key))
 	}
-	return []martini.Handler{bind, upload}
+	return []martini.Handler{binding.MultipartForm(FileData{}), binding.Form(UploadData{}), upload}
 }
