@@ -203,7 +203,7 @@ func listFiles(data *ListReqData, list *KindList) error {
 
 //列出月份
 func listMonths(r *http.Request, list *KindList) error {
-	year, err := strconv.Atoi(strings.TrimSuffix(list.CurrentDirPath, "/"))
+	year, err := strconv.Atoi(strings.TrimSuffix(list.CurrentDirPath, "年"))
 	if err != nil {
 		return err
 	}
