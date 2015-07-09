@@ -119,7 +119,7 @@ func ListFilesHandlers() []martini.Handler {
 		}
 		//根据path建立KindList
 		list := &KindList{CurrentDirPath: strings.TrimSuffix(data.Path, "/")}
-		switch length := len([]rune(data.Path)); length {
+		switch length := len([]rune(list.CurrentDirPath)); length {
 		case 0: //""
 			listYears(r, list)
 		case 5: //"2014年, 2014年"
