@@ -14,7 +14,7 @@ import (
 	"github.com/qiniu/api.v6/rs"
 )
 
-var DB gorm.DB
+var DB *gorm.DB
 
 func init() {
 	var err error
@@ -28,8 +28,7 @@ func init() {
 		panic(fmt.Sprintf("链接数据库错误: '%v'", err))
 	}
 	DB.DB().SetMaxIdleConns(5)
-	//go1.2
-	//DB.DB().SetMaxOpenConns(10)
+	DB.DB().SetMaxOpenConns(10)
 }
 
 //Bucket:七牛bucket的相关信息
