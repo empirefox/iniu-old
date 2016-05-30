@@ -3,11 +3,10 @@ package gorm
 import (
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
+	"github.com/empirefox/gotool/paas"
 	. "github.com/empirefox/iniu-old/conf"
-	"github.com/golang/glog"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 	"github.com/qiniu/api.v6/auth/digest"
@@ -18,17 +17,17 @@ var DB *gorm.DB
 
 func init() {
 	var err error
-	DbUrl := os.Getenv("DB_URL")
-	if DbUrl == "" {
+
+	if paas.Gorm.Url == "" {
 		panic("数据库环境变量没有正确设置")
 	}
-	glog.Infoln(DbUrl)
-	DB, err = gorm.Open("postgres", DbUrl)
+
+	DB, err = gorm.Open(paas.Gorm.Dialect, paas.Gorm.Url)
 	if err != nil {
 		panic(fmt.Sprintf("链接数据库错误: '%v'", err))
 	}
-	DB.DB().SetMaxIdleConns(5)
-	DB.DB().SetMaxOpenConns(10)
+	DB.DB().SetMaxIdleConns(paas.Gorm.MaxIdle)
+	DB.DB().SetMaxOpenConns(paas.Gorm.MaxOpen)
 }
 
 //Bucket:七牛bucket的相关信息
